@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PATH=$(dirname $0)
+
+/usr/bin/ruby -I$PATH/lib $PATH/bin/git-module $*
+
