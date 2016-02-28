@@ -1,5 +1,3 @@
-require_relative 'SubCommand.rb'
-
 module GitModule
   class Remove < SubCommand
     def self.command
@@ -11,6 +9,13 @@ module GitModule
     end
 
     def exec
+      super()
+      usage() unless @args.size == 1
+
+      # TODO: Sicherheitsabfrage
+
+      Module.remove(@args[0])
+ 
       return 0
     end
 

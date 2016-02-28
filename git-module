@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH=$(dirname $0)
+DIR=$(dirname $0)
 
-/usr/bin/ruby -I$PATH/lib $PATH/bin/git-module $*
+/usr/bin/ruby -I$DIR/lib $DIR/bin/git-module "$@"
 

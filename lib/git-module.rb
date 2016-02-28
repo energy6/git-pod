@@ -1,4 +1,5 @@
 require 'pp'
+require 'git'
 
 module GitModule
   class GitModuleException < Exception
@@ -26,7 +27,12 @@ module GitModule
       else
         cmd = SubCommand.create(name, args)
         if cmd
-          return cmd.exec
+          begin
+            cmd.exec
+            return 0
+          rescue SystemExit => e
+            return e.status
+          end
         else
           usage()
           return 1
@@ -37,8 +43,9 @@ module GitModule
     def self.usage
       puts "Usage: git module <subcommand>"
       puts "Subcommands:"
+      width = SubCommand.subcommands.keys.collect{ |k| k.size }.max
       SubCommand.subcommands.each do |cmd, clazz|
-        puts "  %{cmd} - %{desc}" % { :cmd => cmd, :desc => clazz.description }
+        puts "  %-#{width+5}{cmd} %{desc}" % { :cmd => cmd, :desc => clazz.description }
       end
       puts ""
     end
@@ -46,7 +53,7 @@ module GitModule
   end
 end
 
-# require subcommands
-require_relative 'git-module/Create.rb'
-require_relative 'git-module/Remove.rb'
+require_relative 'git-module/Git.rb'
+require_relative 'git-module/Module.rb'
+require_relative 'git-module/SubCommand.rb'
 

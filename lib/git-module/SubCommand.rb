@@ -1,10 +1,23 @@
 require 'optparse'
-require 'git'
+require 'logger'
+
+class OptionParser
+ 
+  def arg name, desc
+    @args = {} unless @args
+    @args[name] = desc
+  end
+  
+  def args
+    return @args || {}
+  end
+  
+end
 
 module GitModule
   class SubCommandException < GitModuleException
   end
-  
+    
   class SubCommand  
     @@SUBCOMMANDS = nil
 
@@ -25,20 +38,44 @@ module GitModule
       return @@SUBCOMMANDS
     end
         
-    def initialize args
-      @repo = Git.open(Dir.pwd, :log => Logger.new(STDOUT))
-      pp @repo.config
+    def initialize args, &block
       @args = args
-      @options = {}
       @opt_parser = OptionParser.new do |opts|
         opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
           @options[:verbose] = v
         end
+        
+        yield opts if block_given?
+
+        opts.banner = "Usage: git module "
+        opts.banner << self.class.command
+        opts.banner << " [options]"
+        opts.args.each { |a,d| opts.banner << " #{a}" }
+        opts.banner << "\n" << self.class.description << "\n"
+        opts.args.each do |arg, desc|
+          name = arg[/[<\[]?(\w+)[>\]]?/, 1]
+          optional = arg.start_with?("[")
+          
+          opts.banner << opts.summary_indent << "%-#{opts.summary_width}s #{desc}\n" % name
+        end
       end
+      @options = {}
     end
             
     def exec
       @opt_parser.parse!(@args)
     end
+    
+    def usage      
+      puts @opt_parser.help
+      exit 1
+    end
   end
 end
+
+# require subcommands
+require_relative 'Create.rb'
+require_relative 'Remove.rb'
+require_relative 'List.rb'
+require_relative 'Update.rb'
+

@@ -1,14 +1,6 @@
 #!/usr/bin/ruby
 
-puts $:
-
-begin
 require 'git-module'
-rescue Exception => e
-  pp e
-end
-
-puts $:
 
 retVal = GitModule::GitModule.run(ARGV)
 
