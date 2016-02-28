@@ -26,4 +26,16 @@ module Git
       checkout oldb
     end
   end
+  
+  class Branch
+    def in_temp(message = 'in branch work')
+      @base.with_temp do
+        if yield
+          @base.commit_all(message)
+        else
+          @base.reset_hard
+        end
+      end
+    end
+  end
 end

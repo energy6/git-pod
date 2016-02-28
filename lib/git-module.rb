@@ -54,6 +54,7 @@ module GitModule
 end
 
 require_relative 'git-module/Git.rb'
+require_relative 'git-module/Metadata.rb'
 require_relative 'git-module/Module.rb'
 require_relative 'git-module/SubCommand.rb'
 

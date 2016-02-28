@@ -7,13 +7,13 @@ module GitModule
   class Module
     def self.create(name, desc)
       repo = Git.open(Dir.pwd)
-      bname = branch_name(name, "master")
+      bname = branch_name(name)
       raise ModuleException.new("A module with name '#{name}' already exists!") if repo.is_branch?(bname)
       
       repo.with_temp do
-        repo.checkout(bname, :orphan => true)
-        File.open(gitmodule, 'w+') { |file| file.puts metadata(name, desc).to_yaml }
-        repo.add(gitmodule)
+        repo.checkout(bname, :orphan => true)        
+        Metadata.create_file(name, desc: desc)
+        repo.add(Metadata.filename)
         repo.commit("Initial new module #{name}")
       end
       
@@ -22,30 +22,24 @@ module GitModule
     
     def self.remove(name)
       repo = Git.open(Dir.pwd)
-      repo.branches.select{ |b| b.name =~ branch_pattern }.each do |b|
+      repo.branches.select{ |b| b.name =~ branch_pattern(name: name) }.each do |b|
+        puts "Removing #{b.name}"
         b.delete
       end
     end
-    
-    def self.metadata(name, desc = nil)
-      { name => desc || "(no description)" }
-    end
-    
-    def self.gitmodule
-      ".gitmodule"
-    end
-    
-    def self.branch_name(name, branch = "master")
+        
+    def self.branch_name(name, branch: "master")
       "modules/#{name}/#{branch}"    
     end
     
-    def self.branch_pattern(branch = "master")
-      /modules\/(\w+)\/#{branch}/
+    def self.branch_pattern(name: /(\w+)/, branch: /(\w+)/)
+      /modules\/#{name}\/#{branch}/
     end
     
     def self.all
       repo = Git.open(Dir.pwd)
-      repo.branches.select{ |b| b.name =~ branch_pattern }.collect{ |b| Module.new(b.name[branch_pattern, 1]) }
+      pattern = branch_pattern(:branch => "master")
+      repo.branches.select{ |b| b.name =~ pattern }.collect{ |b| Module.new(b.name[pattern, 1]) }
     end
     
     def initialize(name)
@@ -53,36 +47,33 @@ module GitModule
       @repo = Git.open(Dir.pwd)
       raise ModuleException.new("No module '#{name}' found!") unless @repo.is_branch?(self.class.branch_name(name))
       @master = @repo.branch(self.class.branch_name(name))
+      @metadata = Metadata.new(@master)
     end
-    
-    def metadata
-      if @master.gcommit.gtree.files.has_key?(self.class.gitmodule)
-        return YAML.load(@master.gcommit.gtree.files[self.class.gitmodule].contents)
-      else 
-        return self.class.metadata(@name)
-      end
+        
+    def branches
+      pattern = self.class.branch_pattern(:name => @name)
+      @repo.branches.select{ |b| b.name =~ pattern }
     end
     
     def name
       @name
     end
-    
+  
     def description
-      return metadata[@name] if metadata.has_key?(@name)
-      return "(no description)"
+      return @metadata.description(@name)
     end
 
     def description=(desc)
-      @repo.with_temp do
-        @master.checkout
-        File.open(self.class.gitmodule, 'w+') do |file|
-          m = metadata
-          m[@name] = desc
-          file.puts m.to_yaml 
-        end
-        @repo.add(self.class.gitmodule)
-        @repo.commit("Changed description for module #{@name}")
-      end
+      @metadata.update(@name, desc: desc)       
+    end
+    
+    def used?
+      m = Metadata.new(@repo.branch(@repo.current_branch))
+      return m.has_module?(@name)
+    end
+    
+    def remove!
+      self.class.remove(@name)
     end
   end
 end

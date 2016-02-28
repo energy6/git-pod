@@ -78,4 +78,5 @@ require_relative 'Create.rb'
 require_relative 'Remove.rb'
 require_relative 'List.rb'
 require_relative 'Update.rb'
+require_relative 'Select.rb'
 
