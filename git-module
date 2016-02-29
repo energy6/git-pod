@@ -2,5 +2,5 @@
 
 DIR=$(dirname $0)
 
-/usr/bin/ruby -I$DIR/lib $DIR/bin/git-module "$@"
+/bin/env ruby -I$DIR/lib $DIR/bin/git-module "$@"
 
