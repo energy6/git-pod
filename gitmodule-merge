@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DIR=$(dirname $0)
+
+/usr/bin/env ruby -I$DIR/lib $DIR/bin/gitmodule-merge "$@"
+

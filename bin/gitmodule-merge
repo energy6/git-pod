@@ -2,7 +2,6 @@
 
 require 'git-module'
 
-retVal = GitModule::GitModule.run(ARGV)
+retVal = GitModule::GitModule.merge(ARGV)
 
 exit retVal
-

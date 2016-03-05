@@ -22,10 +22,12 @@ module GitModule
       ms.select!{ |m| (not m.used?) && @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
       
       repo = Git.open(Dir.pwd)
-      names = ms.collect{ |m| m.name }
-      branches = ms.collect{ |m| Module.branch_name(m.name) }
-      repo.merge(branches, "Select modules: #{names.join(', ')}")
-            
+      branches = ms.collect{ |m| [ m.name, Module.branch_name(m.name) ] }
+
+      branches.to_h().each do |n, b|
+        repo.merge(b, :message => "Select module #{n}.")
+      end
+
       return 0
     end
 

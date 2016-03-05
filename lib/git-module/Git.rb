@@ -11,9 +11,22 @@ module Git
       
       command('checkout', arr_opts)
     end
+
+    def merge(branch, opts = {})
+      arr_opts = []
+      arr_opts << '-m' << opts[:message] if opts[:message]
+      arr_opts << '--no-commit' if opts[:no_commit]
+      arr_opts << '--squash' if opts[:squash]
+      arr_opts += [branch]
+      command('merge', arr_opts)
+    end
   end
   
   class Base
+    def merge(branch, opts = { :message => 'merge' })
+      self.lib.merge(branch, opts)
+    end
+
     def with_temp(&blk)
       oldb = current_branch
       
