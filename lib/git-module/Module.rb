@@ -6,15 +6,14 @@ module GitModule
 
   class Module
     def self.create(name, desc)
-      raise ModuleException.new("Invalid module name '#{name}', containing non-word characters!") unless name =~ /\w+/
       repo = Git.open(Dir.pwd)
       bname = branch_name(name)
       raise ModuleException.new("A module with name '#{name}' already exists!") if repo.is_branch?(bname)
       
       repo.with_temp do
-        repo.checkout(bname, :orphan => true)
-        repo.reset        
-        repo.add Metadata.create_file(name, desc: desc)
+        repo.checkout(bname, :orphan => true)        
+        Metadata.create_file(name, desc: desc)
+        repo.add(Metadata.filename)
         repo.commit("Initial new module #{name}")
       end
       
@@ -34,7 +33,6 @@ module GitModule
     end
     
     def self.branch_pattern(name: /(\w+)/, branch: /(\w+)/)
-      name = name.gsub("*", "\\w*") if name.class == String
       /modules\/#{name}\/#{branch}/
     end
     
@@ -49,7 +47,7 @@ module GitModule
       @repo = Git.open(Dir.pwd)
       raise ModuleException.new("No module '#{name}' found!") unless @repo.is_branch?(self.class.branch_name(name))
       @master = @repo.branch(self.class.branch_name(name))
-      @metadata = Metadata.new(name, @master)
+      @metadata = Metadata.new(@master)
     end
         
     def branches
@@ -62,7 +60,7 @@ module GitModule
     end
   
     def description
-      return @metadata.description
+      return @metadata.description(@name)
     end
 
     def description=(desc)
@@ -70,7 +68,8 @@ module GitModule
     end
     
     def used?
-      Metadata.exists?(@name)
+      m = Metadata.new(@repo.branch(@repo.current_branch))
+      return m.has_module?(@name)
     end
     
     def remove!
