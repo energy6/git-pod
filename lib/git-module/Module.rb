@@ -45,7 +45,7 @@ module GitModule
     def initialize(name)
       @name = name
       @repo = Git.open(Dir.pwd)
-      raise ModuleException.new("No module '#{name}' found!") unless @repo.is_branch?(self.class.branch_name(name))
+      raise ModuleException, "No module '#{name}' found!" unless @repo.is_branch?(self.class.branch_name(name))
       @master = @repo.branch(self.class.branch_name(name))
       @metadata = Metadata.new(@master)
     end
@@ -74,6 +74,30 @@ module GitModule
     
     def remove!
       self.class.remove(@name)
+    end
+
+    def on_worktree(branch, &block)      
+      workdir = File.join(@repo.dir.to_s, ".worktree", @name, branch)
+
+      worktree = @repo.new_worktree(workdir, self.class.branch_name(@name, branch: branch))
+      yield worktree 
+    end
+
+    def addFiles(branch, files)
+      on_worktree(branch) do |repo|
+        repo.checkout_file(@repo.current_branch, files)
+        repo.add(files)
+      end
+    end
+
+    def commit(branch, message)
+      on_worktree(branch) { |repo| repo.commit(message) }
+    end
+
+    def status(branch)
+      on_worktree(branch) do |repo| 
+        puts repo.status.pretty
+      end
     end
   end
 end

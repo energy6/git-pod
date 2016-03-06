@@ -21,15 +21,11 @@ module GitModule
     end
     
     def exec
-      super()
-      begin
-        raise SubCommandException.new if @args.size != 1
+      super do
+        raise SubCommandException, "A single module name needed" if @args.size != 1
         m = Module.new(@args[0])
         m.description = @options[:desc] if @options.has_key?(:desc)
-      rescue SubCommandException => e
-        usage()
       end      
-      return 0
     end
 
   end

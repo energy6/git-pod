@@ -64,6 +64,13 @@ module GitModule
             
     def exec
       @opt_parser.parse!(@args)
+      begin
+        yield if block_given?
+      rescue GitModuleException => e
+        STDERR.puts e.message
+        usage()        
+      end
+      return 0
     end
     
     def usage      
@@ -74,9 +81,14 @@ module GitModule
 end
 
 # require subcommands
+require_relative 'Add.rb'
 require_relative 'Create.rb'
-require_relative 'Remove.rb'
+require_relative 'Commit.rb'
 require_relative 'List.rb'
-require_relative 'Update.rb'
+require_relative 'Migrate.rb'
+require_relative 'Remove.rb'
 require_relative 'Select.rb'
 require_relative 'Setup.rb'
+require_relative 'Status.rb'
+require_relative 'Upgrade.rb'
+require_relative 'Update.rb'

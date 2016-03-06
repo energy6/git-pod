@@ -21,17 +21,15 @@ module GitModule
     end
     
     def exec
-      super()
-      
-      ms = Module.all    
-      ms.select!{ |m| @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
-      ms.select!{ |m| m.used? == @options[:used] } if @options.has_key?(:used)
-      
-      ms.each do |m|
-        puts "  %-10s  %s\n" % [ m.name, m.description ]
+      super do
+        ms = Module.all    
+        ms.select!{ |m| @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
+        ms.select!{ |m| m.used? == @options[:used] } if @options.has_key?(:used)
+        
+        ms.each do |m|
+          puts "  %-10s  %s\n" % [ m.name, m.description ]
+        end      
       end
-      
-      return 0
     end
 
   end

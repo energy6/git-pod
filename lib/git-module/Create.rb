@@ -21,12 +21,11 @@ module GitModule
     end
         
     def exec
-      super()
-      usage() unless @args.size == 1
+      super do
+        raise SubCommandException, "No name given." unless @args.size == 1
       
-      Module.create(@args[0], @options[:desc])
-      
-      return 0
+        Module.create(@args[0], @options[:desc])
+      end
     end
         
   end

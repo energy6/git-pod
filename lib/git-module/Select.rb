@@ -1,5 +1,5 @@
 module GitModule
-  class Update < SubCommand
+  class Select < SubCommand
     def self.command
       "select"
     end
@@ -11,24 +11,25 @@ module GitModule
     def initialize args
        super(args) do |opts|
         
-        opts.arg("<name> [name ...]", "Name(s) of module(s) to be selected")
+        opts.arg("<name> [<name> ...]", "Name(s) of module(s) to be selected")
         
       end
     end
     
     def exec
-      super()
-      ms = Module.all      
-      ms.select!{ |m| (not m.used?) && @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
-      
-      repo = Git.open(Dir.pwd)
-      branches = ms.collect{ |m| [ m.name, Module.branch_name(m.name) ] }
+      super do
+        raise SubCommandException, "No module name/pattern given" if @args.size < 1
 
-      branches.to_h().each do |n, b|
-        repo.merge(b, :message => "Select module #{n}.")
+        ms = Module.all      
+        ms.select!{ |m| (not m.used?) && @args.any?{ |a| m.name =~ /#{a}/ } } 
+        
+        repo = Git.open(Dir.pwd)
+        branches = ms.collect{ |m| [ m.name, Module.branch_name(m.name) ] }
+
+        branches.to_h().each do |n, b|
+          repo.merge(b, :message => "Select module #{n}.")
+        end
       end
-
-      return 0
     end
 
   end
