@@ -82,6 +82,7 @@ end
 
 # require subcommands
 require_relative 'Add.rb'
+require_relative 'Checkout.rb'
 require_relative 'Create.rb'
 require_relative 'Commit.rb'
 require_relative 'List.rb'

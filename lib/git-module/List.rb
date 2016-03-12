@@ -26,9 +26,13 @@ module GitModule
         ms.select!{ |m| @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
         ms.select!{ |m| m.used? == @options[:used] } if @options.has_key?(:used)
         
-        ms.each do |m|
-          puts "  %-10s  %s\n" % [ m.name, m.description ]
-        end      
+        if ms.size > 0
+          ms.each do |m|
+            puts "  %-10s  %s\n" % [ m.name, m.description ]
+          end      
+        else
+          puts "No modules available."
+        end
       end
     end
 

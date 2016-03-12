@@ -33,7 +33,7 @@ module GitModule
     end
     
     def description(name)
-      m = @metadata[name] rescue self.class.default(name)
+      m = @metadata[name] || self.class.default(name)
       return m[:desc] 
     end
 

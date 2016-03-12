@@ -11,7 +11,8 @@ module GitModule
       raise ModuleException.new("A module with name '#{name}' already exists!") if repo.is_branch?(bname)
       
       repo.with_temp do
-        repo.checkout(bname, :orphan => true)        
+        repo.checkout(bname, :orphan => true)
+        repo.reset() 
         Metadata.create_file(name, desc: desc)
         repo.add(Metadata.filename)
         repo.commit("Initial new module #{name}")
@@ -26,6 +27,8 @@ module GitModule
         puts "Removing #{b.name}"
         b.delete
       end
+      workdir = File.join(@repo.dir.to_s, ".worktree", @name)
+      FileUtils.remove_entry_secure(workdir) if Dir.exists?(workdir)
     end
         
     def self.branch_name(name, branch: "master")
@@ -77,10 +80,12 @@ module GitModule
     end
 
     def on_worktree(branch, &block)      
-      workdir = File.join(@repo.dir.to_s, ".worktree", @name, branch)
+      yield checkout(branch) 
+    end
 
-      worktree = @repo.new_worktree(workdir, self.class.branch_name(@name, branch: branch))
-      yield worktree 
+    def checkout(branch)
+      workdir = File.join(@repo.dir.to_s, ".worktree", @name, branch)
+      worktree = @repo.new_worktree(workdir, self.class.branch_name(@name, branch: branch))      
     end
 
     def addFiles(branch, files)
@@ -97,6 +102,24 @@ module GitModule
     def status(branch)
       on_worktree(branch) do |repo| 
         puts repo.status.pretty
+      end
+    end
+
+    def contains?(fileOrDir, branch: "master")
+      b = @repo.branch(self.class.branch_name(@name, branch: branch))
+      tree = b.gcommit.gtree
+      splits = File.split(fileOrDir)
+      splits.shift() if splits[0] == "."
+      splits.each do |segment|
+        tree = tree.children[segment] unless tree == nil      
+      end
+      return tree != nil
+    end
+
+    def migrate(branch)
+      b = @repo.branch(self.class.branch_name(@name, branch: branch))
+      @repo.diff(b, @repo.current_branch).stats[:files].each_key do |file| 
+        puts "#{file}: #{self.contains?(file, branch: branch)}"
       end
     end
   end
