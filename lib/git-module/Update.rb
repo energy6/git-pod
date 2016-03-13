@@ -5,7 +5,7 @@ module GitModule
     end
     
     def self.description
-      "Updates a module"
+      "Update module meta data"
     end
  
     def initialize args

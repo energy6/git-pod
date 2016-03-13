@@ -5,7 +5,7 @@ module GitModule
     end
     
     def self.description
-      "Upgrade modules"
+      "Upgrade used modules to latest version"
     end
  
     def initialize args

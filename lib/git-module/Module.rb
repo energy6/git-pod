@@ -118,8 +118,17 @@ module GitModule
 
     def migrate(branch)
       b = @repo.branch(self.class.branch_name(@name, branch: branch))
-      @repo.diff(b, @repo.current_branch).stats[:files].each_key do |file| 
-        puts "#{file}: #{self.contains?(file, branch: branch)}"
+      base = @repo.merge_base(['HEAD', b])
+      diff = @repo.diff(base, @repo.current_branch)
+      files = diff.stats[:files].keys() \
+        .delete_if{ |f| File.split(f).any?{ |ff| ff != "." &&  ff.start_with?('.') } } \
+        .keep_if{ |f| contains?(f, branch: branch) }
+      files.each do |file|
+        puts "  Patching file #{file}"
+        on_worktree(branch) do |repo|
+          repo.apply_diff(diff[file])
+          repo.add(file)
+        end
       end
     end
   end
