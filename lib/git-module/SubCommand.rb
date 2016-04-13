@@ -1,13 +1,17 @@
 require 'optparse'
 require 'logger'
 
+# Monkey patch for the OptionParser
 class OptionParser
  
+  # Define a new argument with name and description.
   def arg name, desc
     @args = {} unless @args
     @args[name] = desc
   end
   
+  # Returns the Hash with all previously defined arguments
+  # Keys are argument names, values are the description 
   def args
     return @args || {}
   end
@@ -15,12 +19,24 @@ class OptionParser
 end
 
 module GitModule
+  # Exception for SubEommand
   class SubCommandException < GitModuleException
   end
     
+  # git module <subcommand>
+  # Each subcommand provides a single action.
+  # This base class defines some common
+  # command line options valid for all subcommands.
   class SubCommand  
     @@SUBCOMMANDS = nil
 
+    # Create a subcommand instance for the
+    # named subcommand and an array of arguments.
+    # All subclasses of SubCommand are searched
+    # for a class which implements a command
+    # matching the given name (used like a regex).
+    # The given command name must not be an exact
+    # but a single match. 
     def self.create name, args
       matches = SubCommand.subcommands.keys.grep(/^#{name}/)
       if matches.size == 1
@@ -30,6 +46,8 @@ module GitModule
       return nil
     end
     
+    # Helper to collect all subclasses of SubCommand
+    # and cache them in a global command map.
     def self.subcommands
       unless @@SUBCOMMANDS
         clazzes = ObjectSpace.each_object(Class).select { |clazz| clazz < self } 
@@ -38,6 +56,13 @@ module GitModule
       return @@SUBCOMMANDS
     end
         
+    # Create a new Subcommand instance with the given arguments. The arguments
+    # are stored internally to be evaluated on command execution.
+    #
+    # An optional block can be provided to hook into the option parser
+    # configuration phase. The block is called after the default options are
+    # configured. The option parser instance is given as an argument to the
+    # block.
     def initialize args, &block
       @args = args
       @opt_parser = OptionParser.new do |opts|
@@ -62,6 +87,12 @@ module GitModule
       @options = {}
     end
             
+    # Execute the subcommand with the stored arguments.
+    # This method should be overridden by any subclass and called with a block
+    # provided. Within the block the subcommands actions should be performed.
+    # In case of an subcommand error, the subcommand can raise a
+    # SubCommandException. This leads to printing out the usage information
+    # automatically.
     def exec
       @opt_parser.parse!(@args)
       begin
@@ -73,6 +104,7 @@ module GitModule
       return 0
     end
     
+    # Print out the usage information, see OptionParser#help.
     def usage      
       puts @opt_parser.help
       exit 1

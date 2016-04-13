@@ -2,10 +2,15 @@ require 'pp'
 require 'git'
 
 module GitModule
+  # Module specific exception
   class GitModuleException < Exception
   end
   
+  # Main class
   class GitModule
+
+    # Runs the subcommand provided on command line
+    # argv - Array with command line arguments, should contain the subcommand, options and arguments 
     def self.run(argv)
       begin
         name = argv.shift
@@ -20,6 +25,9 @@ module GitModule
       end
     end
 
+    # Execute the named subcommand with further options/arguments.
+    # name - Name of the subcommand
+    # args - Array with options and arguments
     def self.exec name, args
       unless name
         usage()
@@ -40,6 +48,9 @@ module GitModule
       end
     end
     
+    # Prints out the usage help to STDOUT
+    # At this stage of usage all
+    # available subcommands are listed.
     def self.usage
       puts "Usage: git module <subcommand>"
       puts "Subcommands:"
@@ -50,6 +61,9 @@ module GitModule
       puts ""
     end
 
+    # Combines two YAML configuration files given
+    # by argv[1] and argv[2]. The content of the
+    # two files is simply combined using Hash#merge
     def self.merge(argv)
       contentA = YAML.load(File.read(argv[1]))
       contentB = YAML.load(File.read(argv[2]))

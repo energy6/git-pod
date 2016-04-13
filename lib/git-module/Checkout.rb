@@ -1,11 +1,16 @@
 require 'rake'
 
 module GitModule
+
+  # This subcommand create a worktree for a module branch.
   class Checkout < SubCommand  
+
+    # Command
     def self.command
       "checkout"
     end
     
+    # Description
     def self.description
       "Create a worktree for module"
     end
