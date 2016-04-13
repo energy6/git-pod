@@ -1,9 +1,9 @@
 require 'rake'
 
-module GitModule
-  # Implementation of the subcommand "git module add"
-  # This subcommand transferes files from the active branch to the module
-  # and adds them to the index for a later commit, see GitModule::Commit.
+module GitPod
+  # Implementation of the subcommand "git pod add"
+  # This subcommand transferes files from the active branch to the pod
+  # and adds them to the index for a later commit, see GitPod::Commit.
   class Add < SubCommand  
 
     # Command
@@ -13,19 +13,19 @@ module GitModule
     
     # Description
     def self.description
-      "Add files to a module's index"
+      "Add files to a pod's index"
     end
     
     # Create a subcommand instance with given args.   
     def initialize(args)
       super(args) do |opts|
-        opts.arg("<file> [<file> ...]", "Files to be added to the module's index")
+        opts.arg("<file> [<file> ...]", "Files to be added to the pod's index")
 
-        opts.on("-m", "--module NAME", "Module to add the file to") do |v|
-          @options[:module] = v
+        opts.on("-p", "--pod NAME", "Pod to add the file to") do |v|
+          @options[:pod] = v
         end
 
-        opts.on("-b", "--branch [NAME]", "Modules branch to add file to") do |v|
+        opts.on("-b", "--branch [NAME]", "Pods branch to add file to") do |v|
           @options[:branch] = v
         end
       end
@@ -34,10 +34,10 @@ module GitModule
     # Execute the command
     def exec
       super do        
-        raise SubCommandException, "Module must be given" unless @options[:module]
+        raise SubCommandException, "Pod must be given" unless @options[:pod]
         raise SubCommandException, "No files given" if @args.size < 1
 
-        mod = Module.new(@options[:module])
+        mod = Pod.new(@options[:pod])
 
         branch = @options[:branch] || "master"        
         files = @args.collect{ |a| Rake::FileList[a] }.flatten!

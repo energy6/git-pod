@@ -1,26 +1,26 @@
 require 'rake'
 
-module GitModule
+module GitPod
   class Commit < SubCommand  
     def self.command
       "commit"
     end
     
     def self.description
-      "Commits currently staged files for module"
+      "Commits currently staged files for pod"
     end
     
     def initialize(args)
       super(args) do |opts|
-        opts.on("-m", "--module NAME", "Module to commit changes to") do |v|
-          @options[:module] = v
+        opts.on("-p", "--pod NAME", "Pod to commit changes to") do |v|
+          @options[:pod] = v
         end
 
-        opts.on("-b", "--branch [NAME]", "Modules branch to commit changes to") do |v|
+        opts.on("-b", "--branch [NAME]", "Pods branch to commit changes to") do |v|
           @options[:branch] = v
         end
 
-        opts.on("-c", "--cmessage MSG", "Commit message") do |v|
+        opts.on("-m", "--message MSG", "Commit message") do |v|
           @options[:cmessage] = v
         end
         
@@ -29,10 +29,10 @@ module GitModule
 
     def exec
       super do        
-        raise SubCommandException, "Module must be given" unless @options[:module]
+        raise SubCommandException, "Pod must be given" unless @options[:pod]
         raise SubCommandException, "Commit message must be given" unless @options[:cmessage]
 
-        mod = Module.new(@options[:module])
+        mod = Pod.new(@options[:pod])
         branch = @options[:branch] || "master"
 
         mod.commit(branch, @options[:cmessage])

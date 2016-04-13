@@ -1,22 +1,22 @@
 require 'rake'
 
-module GitModule
+module GitPod
   class Status < SubCommand  
     def self.command
       "status"
     end
     
     def self.description
-      "Status of index for a module"
+      "Status of index for a pod"
     end
     
     def initialize(args)
       super(args) do |opts|
-        opts.on("-m", "--module NAME", "Module to commit changes to") do |v|
-          @options[:module] = v
+        opts.on("-p", "--pod NAME", "Pod to commit changes to") do |v|
+          @options[:pod] = v
         end
 
-        opts.on("-b", "--branch [NAME]", "Modules branch to commit changes to") do |v|
+        opts.on("-b", "--branch [NAME]", "Pods branch to commit changes to") do |v|
           @options[:branch] = v
         end
         
@@ -25,9 +25,9 @@ module GitModule
 
     def exec
       super do        
-        raise SubCommandException, "Module must be given" unless @options[:module]
+        raise SubCommandException, "Pod must be given" unless @options[:pod]
 
-        mod = Module.new(@options[:module])
+        mod = Pod.new(@options[:pod])
         branch = @options[:branch] || "master"
 
         mod.status(branch)

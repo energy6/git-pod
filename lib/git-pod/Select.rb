@@ -1,33 +1,33 @@
-module GitModule
+module GitPod
   class Select < SubCommand
     def self.command
       "select"
     end
     
     def self.description
-      "Select modules to be used"
+      "Select pods to be used"
     end
  
     def initialize args
        super(args) do |opts|
         
-        opts.arg("<name> [<name> ...]", "Name(s) of module(s) to be selected")
+        opts.arg("<name> [<name> ...]", "Name(s) of pod(s) to be selected")
         
       end
     end
     
     def exec
       super do
-        raise SubCommandException, "No module name/pattern given" if @args.size < 1
+        raise SubCommandException, "No pod name/pattern given" if @args.size < 1
 
-        ms = Module.all      
+        ms = Pod.all      
         ms.select!{ |m| (not m.used?) && @args.any?{ |a| m.name =~ /#{a}/ } } 
         
         repo = Git.open(Dir.pwd)
-        branches = ms.collect{ |m| [ m.name, Module.branch_name(m.name) ] }
+        branches = ms.collect{ |m| [ m.name, Pod.branch_name(m.name) ] }
 
         branches.to_h().each do |n, b|
-          repo.merge(b, :message => "Select module #{n}.")
+          repo.merge(b, :message => "Select pod #{n}.")
         end
       end
     end

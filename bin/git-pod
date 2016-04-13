@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'git-module'
+require 'git-pod'
 
-retVal = GitModule::GitModule.run(ARGV)
+retVal = GitPod::GitPod.run(ARGV)
 
 exit retVal
 

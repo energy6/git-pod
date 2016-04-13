@@ -18,12 +18,12 @@ class OptionParser
   
 end
 
-module GitModule
+module GitPod
   # Exception for SubEommand
-  class SubCommandException < GitModuleException
+  class SubCommandException < GitPodException
   end
     
-  # git module <subcommand>
+  # git pod <subcommand>
   # Each subcommand provides a single action.
   # This base class defines some common
   # command line options valid for all subcommands.
@@ -72,7 +72,7 @@ module GitModule
         
         yield opts if block_given?
 
-        opts.banner = "Usage: git module "
+        opts.banner = "Usage: git pod "
         opts.banner << self.class.command
         opts.banner << " [options]"
         opts.args.each { |a,d| opts.banner << " #{a}" }
@@ -97,7 +97,7 @@ module GitModule
       @opt_parser.parse!(@args)
       begin
         yield if block_given?
-      rescue GitModuleException => e
+      rescue GitPodException => e
         STDERR.puts e.message
         usage()        
       end

@@ -1,20 +1,20 @@
 require 'rake'
 
-module GitModule
+module GitPod
   class Migrate < SubCommand  
     def self.command
       "migrate"
     end
     
     def self.description
-      "Migrate changes to modules"
+      "Migrate changes to pods"
     end
     
     def initialize(args)
       super(args) do |opts|
-        opts.arg("[<module> ...]", "Only changes to selected modules are migrated")
+        opts.arg("[<pod> ...]", "Only changes to selected pods are migrated")
 
-        opts.on("-b", "--branch [NAME]", "Module branch to migrate changes to") do |v|
+        opts.on("-b", "--branch [NAME]", "Pod branch to migrate changes to") do |v|
           @options[:branch] = v
         end
         
@@ -23,7 +23,7 @@ module GitModule
 
     def exec
       super do        
-        ms = Module.all    
+        ms = Pod.all    
         ms.select!{ |m| m.used? } 
         ms.select!{ |m| @args.any?{ |a| m.name =~ /#{a}/ } } if @args.size > 0
         ms.each do |m|

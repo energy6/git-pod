@@ -1,8 +1,8 @@
-module GitModule
+module GitPod
   class Metadata
   
     def self.filename
-      ".gitmodule"
+      ".gitpod"
     end
     
     def self.default(name, desc: "(no description)")
@@ -28,7 +28,7 @@ module GitModule
       end
     end
     
-    def has_module?(name)
+    def has_pod?(name)
       @metadata.has_key?(name)
     end
     
@@ -38,7 +38,7 @@ module GitModule
     end
 
     def update(name, desc: nil)
-      @branch.in_temp("Changed metadata for module #{@name}") do
+      @branch.in_temp("Changed metadata for pod #{@name}") do
         @metadata[name][:desc] = desc if desc
         File.open(self.class.filename, 'w+') do |file|
           file.puts @metadata.to_yaml 

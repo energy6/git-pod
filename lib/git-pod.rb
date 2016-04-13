@@ -1,13 +1,13 @@
 require 'pp'
 require 'git'
 
-module GitModule
-  # Module specific exception
-  class GitModuleException < Exception
+module GitPod
+  # Pod specific exception
+  class GitPodException < Exception
   end
   
   # Main class
-  class GitModule
+  class GitPod
 
     # Runs the subcommand provided on command line
     # argv - Array with command line arguments, should contain the subcommand, options and arguments 
@@ -15,7 +15,7 @@ module GitModule
       begin
         name = argv.shift
         return exec(name, argv)
-      rescue GitModuleException => e        
+      rescue GitPodException => e        
         puts e.message
         return 1
       rescue Exception => e
@@ -52,7 +52,7 @@ module GitModule
     # At this stage of usage all
     # available subcommands are listed.
     def self.usage
-      puts "Usage: git module <subcommand>"
+      puts "Usage: git pod <subcommand>"
       puts "Subcommands:"
       width = SubCommand.subcommands.keys.collect{ |k| k.size }.max
       SubCommand.subcommands.each do |cmd, clazz|
@@ -76,8 +76,8 @@ module GitModule
   end
 end
 
-require_relative 'git-module/Git.rb'
-require_relative 'git-module/Metadata.rb'
-require_relative 'git-module/Module.rb'
-require_relative 'git-module/SubCommand.rb'
+require_relative 'git-pod/Git.rb'
+require_relative 'git-pod/Metadata.rb'
+require_relative 'git-pod/Pod.rb'
+require_relative 'git-pod/SubCommand.rb'
 

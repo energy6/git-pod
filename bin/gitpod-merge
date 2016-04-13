@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'git-module'
+require 'git-pod'
 
-retVal = GitModule::GitModule.merge(ARGV)
+retVal = GitPod::GitPod.merge(ARGV)
 
 exit retVal

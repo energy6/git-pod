@@ -109,7 +109,7 @@ module Git
     # Enhancement/fix to the original Git::Base.initialize method in order
     # to allow an instance to represent a primary git repo (with a .git
     # directory) as well as a secondary repo (with just .git file pointing to
-    # the real .git directory). This is needed to handle submodules and
+    # the real .git directory). This is needed to handle subpods and
     # worktrees.
     def initialize(options = {})
       if working_dir = options[:working_directory]

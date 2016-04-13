@@ -1,8 +1,8 @@
 require 'rake'
 
-module GitModule
+module GitPod
 
-  # This subcommand create a worktree for a module branch.
+  # This subcommand create a worktree for a pod branch.
   class Checkout < SubCommand  
 
     # Command
@@ -12,12 +12,12 @@ module GitModule
     
     # Description
     def self.description
-      "Create a worktree for module"
+      "Create a worktree for pod"
     end
     
     def initialize(args)
       super(args) do |opts|
-        opts.arg("<name>", "Module to create worktree for")
+        opts.arg("<name>", "Pod to create worktree for")
 
         opts.on("-b", "--branch [NAME]", "Select branch, default master") do |v|
           @options[:branch] = v
@@ -28,9 +28,9 @@ module GitModule
 
     def exec
       super do        
-        raise SubCommandException, "One module name must be given" if @args.size != 1
+        raise SubCommandException, "One pod name must be given" if @args.size != 1
 
-        mod = Module.new(@args[0])
+        mod = Pod.new(@args[0])
         branch = @options[:branch] || "master"
 
         worktree = mod.checkout(branch)

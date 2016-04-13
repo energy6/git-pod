@@ -1,19 +1,19 @@
-module GitModule
+module GitPod
   class Update < SubCommand
     def self.command
       "update"
     end
     
     def self.description
-      "Update module meta data"
+      "Update pod meta data"
     end
  
     def initialize args
        super(args) do |opts|
         
-        opts.arg("<name>", "Name of module to update")
+        opts.arg("<name>", "Name of pod to update")
 
-        opts.on("-d DESC", "--desc=DESC", "Set module description to DESC") do |v|
+        opts.on("-d DESC", "--desc=DESC", "Set pod description to DESC") do |v|
           @options[:desc] = v
         end
         
@@ -22,8 +22,8 @@ module GitModule
     
     def exec
       super do
-        raise SubCommandException, "A single module name needed" if @args.size != 1
-        m = Module.new(@args[0])
+        raise SubCommandException, "A single pod name needed" if @args.size != 1
+        m = Pod.new(@args[0])
         m.description = @options[:desc] if @options.has_key?(:desc)
       end      
     end
