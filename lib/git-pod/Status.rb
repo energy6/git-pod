@@ -12,11 +12,9 @@ module GitPod
     
     def initialize(args)
       super(args) do |opts|
-        opts.on("-p", "--pod NAME", "Pod to commit changes to") do |v|
-          @options[:pod] = v
-        end
+        opts.arg("<pod> ", "Pod to give status for")
 
-        opts.on("-b", "--branch [NAME]", "Pods branch to commit changes to") do |v|
+        opts.on("-b", "--branch [NAME]", "Pods branch to state, defaults to master") do |v|
           @options[:branch] = v
         end
         
@@ -25,9 +23,9 @@ module GitPod
 
     def exec
       super do        
-        raise SubCommandException, "Pod must be given" unless @options[:pod]
+        raise SubCommandException, "One pod name must be given" unless @args.size == 1
 
-        mod = Pod.new(@options[:pod])
+        mod = Pod.new(@args[0])
         branch = @options[:branch] || "master"
 
         mod.status(branch)

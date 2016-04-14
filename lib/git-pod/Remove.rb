@@ -8,11 +8,17 @@ module GitPod
       "Remove a pod"
     end
 
+    def initialize(args)
+      super(args) do |opts|
+        opts.arg("<pod> [<pod> ...]", "Selected pods are removed")
+      end
+    end
+
     def exec
       super do
-        raise SubCommandException, "No pod name given" unless @args.size == 1
+        raise SubCommandException, "No pods given!" unless @args.size > 0
         # TODO: Sicherheitsabfrage
-        Pod.remove(@args[0])
+        @args.each { |p|  Pod.remove(p) }
       end
     end
 
