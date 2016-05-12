@@ -1,0 +1,9 @@
+History.txt
+Manifest.txt
+README.md
+Rakefile
+bin/git-pod
+bin/gitpod-merge
+lib/git-pod/*.rb
+lib/git-pod.rb
+test/test_git/pod.rb
