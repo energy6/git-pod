@@ -6,7 +6,7 @@ class OptionParser
  
   # Define a new argument with name and description.
   def arg name, desc
-    @args = {} unless @args
+    @args ||= {}
     @args[name] = desc
   end
   
