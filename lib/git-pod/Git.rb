@@ -50,6 +50,7 @@ module Git
       arr_opts << '-m' << opts[:message] if opts[:message]
       arr_opts << '--no-commit' if opts[:no_commit]
       arr_opts << '--squash' if opts[:squash]
+      arr_opts << '--allow-unrelated-histories' if opts[:unrelated]
       arr_opts += [branch]
       command('merge', arr_opts)
     end

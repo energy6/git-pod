@@ -1,46 +1,47 @@
 module GitPod
   class Metadata
   
-    def self.filename
-      ".gitpod"
+    def self.filename(name)
+      ".#{name}.gitpod"
     end
     
     def self.default(name, desc: "(no description)")
-      { name => { :desc => desc } }
+      { :name => name, :desc => desc }
     end
     
     def self.create_file(name, desc: "(no description)")
-      File.open(filename, 'w+') do |file|
+      File.open(filename(name), 'w+') do |file|
         file.puts default(name, desc: desc).to_yaml
       end
     end
+
+    def self.has_file?(branch, name)
+        branch.gcommit.gtree.files.has_key?(filename(name))
+    end
     
-    def initialize(branch)
+    def initialize(name, branch)
+      @name = name
       @branch = branch
       reload
     end
     
     def reload
-      if @branch.gcommit.gtree.files.has_key?(self.class.filename)
-        @metadata = YAML.load(@branch.gcommit.gtree.files[self.class.filename].contents)
+      if self.class.has_file?(@branch, @name) 
+        @metadata = YAML.load(@branch.gcommit.gtree.files[self.class.filename(@name)].contents)
       else
         @metadata = {}
       end
     end
-    
-    def has_pod?(name)
-      @metadata.has_key?(name)
-    end
-    
-    def description(name)
-      m = @metadata[name] || self.class.default(name)
+        
+    def description
+      m = @metadata || self.class.default(@name)
       return m[:desc] 
     end
 
     def update(name, desc: nil)
       @branch.in_temp("Changed metadata for pod #{@name}") do
-        @metadata[name][:desc] = desc if desc
-        File.open(self.class.filename, 'w+') do |file|
+        @metadata[:desc] = desc if desc
+        File.open(self.class.filename(name), 'w+') do |file|
           file.puts @metadata.to_yaml 
         end
         return true

@@ -65,11 +65,13 @@ module GitPod
     # by argv[1] and argv[2]. The content of the
     # two files is simply combined using Hash#merge
     def self.merge(argv)
+      puts "merging #{argv[1]} and #{argv[2]}..."
       contentA = YAML.load(File.read(argv[1]))
       contentB = YAML.load(File.read(argv[2]))
       File.open(argv[1], 'w+') do |file|
         file.puts contentA.merge(contentB).to_yaml
       end
+      puts "merge successfull."
       return 0
     end
         

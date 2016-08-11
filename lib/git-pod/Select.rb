@@ -27,7 +27,7 @@ module GitPod
         branches = ms.collect{ |m| [ m.name, Pod.branch_name(m.name) ] }
 
         branches.to_h().each do |n, b|
-          repo.merge(b, :message => "Select pod #{n}.")
+          repo.merge(b, :message => "Select pod #{n}.", :unrelated => true)
         end
       end
     end

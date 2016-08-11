@@ -34,7 +34,7 @@ module GitPod
         repo.checkout(bname, :orphan => true)
         repo.reset() 
         Metadata.create_file(name, desc: desc)
-        repo.add(Metadata.filename)
+        repo.add(Metadata.filename(name))
         repo.commit("Initial new pod #{name}")
       end
       
@@ -85,7 +85,7 @@ module GitPod
       @repo = Git.open(Dir.pwd)
       raise PodException, "No pod '#{name}' found!" unless @repo.is_branch?(self.class.branch_name(name))
       @master = @repo.branch(self.class.branch_name(name))
-      @metadata = Metadata.new(@master)
+      @metadata = Metadata.new(name, @master)
       @zombie = false
     end
         
@@ -106,7 +106,7 @@ module GitPod
     # Returns the pods description, see Metadata#description.
     def description
       zombie_check
-      @metadata.description(@name)
+      @metadata.description
     end
 
     # Sets the pods description to a new text, see Metadata#update.
@@ -119,8 +119,7 @@ module GitPod
     # Metadata.has_pod?
     def used?
       zombie_check
-      m = Metadata.new(@repo.branch(@repo.current_branch))
-      return m.has_pod?(@name)
+      return Metadata.has_file?(@repo.branch(@repo.current_branch), @name)
     end
     
     # Removes this pod. This instance must not be used any more after
