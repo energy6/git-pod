@@ -19,10 +19,11 @@ def create_tmp_repo()
   FileUtils.touch "#{tempdir}/README.txt"
   repo.add "#{tempdir}/README.txt"
   repo.commit "Initial"
-  return tempdir
+  return repo
 end
 
-def cleanup_tmp_repo(testname, tempdir, passed)
+def cleanup_tmp_repo(testname, repo, passed)
+  tempdir = repo.dir.to_s
   unless passed
     filename = "#{testname.gsub(/\W/, "_")}-#{DateTime.now().strftime("%Y%m%d%H%M%S")}.zip"
     zip_folder(tempdir, filename)

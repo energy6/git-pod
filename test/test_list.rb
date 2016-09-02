@@ -14,19 +14,19 @@ describe GitPod::List do
   include Ramcrest::IncludesInAnyOrderExactly
 
   before do
-    @tempdir = create_tmp_repo()
-    Dir.chdir(@tempdir) do
+    @repo = create_tmp_repo()
+    Dir.chdir(@repo.dir.to_s) do
       GitPod::Setup.new([]).exec()
     end
   end
 
   after do
-    cleanup_tmp_repo(self.name, @tempdir, passed?)    
+    cleanup_tmp_repo(self.name, @repo, passed?)    
   end
 
   describe "when listing all available pods" do
     before do
-      Dir.chdir(@tempdir) do
+      Dir.chdir(@repo.dir.to_s) do
         @out, @err = capture_io do
           GitPod::List.new([]).exec()
         end
@@ -43,7 +43,7 @@ describe GitPod::List do
 
   describe "when listing all available pods" do
     before do
-      Dir.chdir(@tempdir) do
+      Dir.chdir(@repo.dir.to_s) do
         GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
         GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
         GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
@@ -70,7 +70,7 @@ describe GitPod::List do
 
   describe "when listing all selected pods" do
     before do
-      Dir.chdir(@tempdir) do
+      Dir.chdir(@repo.dir.to_s) do
         GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
         GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
         GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
@@ -94,7 +94,7 @@ describe GitPod::List do
 
   describe "when listing all not selected pods" do
     before do
-      Dir.chdir(@tempdir) do
+      Dir.chdir(@repo.dir.to_s) do
         GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
         GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
         GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
