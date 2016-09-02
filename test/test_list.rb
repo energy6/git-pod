@@ -17,12 +17,6 @@ describe GitPod::List do
     @tempdir = create_tmp_repo()
     Dir.chdir(@tempdir) do
       GitPod::Setup.new([]).exec()
-      GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
-      GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
-      GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
-      GitPod::Create.new(["-d", "Test Pod D", "testPodD"]).exec()
-      GitPod::Create.new(["-d", "Test Pod E", "testPodE"]).exec()
-      GitPod::Select.new([ "testPodB", "testPodC" ]).exec()
     end
   end
 
@@ -33,9 +27,31 @@ describe GitPod::List do
   describe "when listing all available pods" do
     before do
       Dir.chdir(@tempdir) do
-        command = GitPod::List.new []
         @out, @err = capture_io do
-          command.exec()
+          GitPod::List.new([]).exec()
+        end
+      end
+    end
+
+    it "gives " do
+      lines = @out.split("\n")
+      assert_that lines, includes_in_any_order_exactly(
+          matches_pattern(/\s*No pods available.\s*/)
+        )
+    end
+  end
+
+  describe "when listing all available pods" do
+    before do
+      Dir.chdir(@tempdir) do
+        GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
+        GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
+        GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
+        GitPod::Create.new(["-d", "Test Pod D", "testPodD"]).exec()
+        GitPod::Create.new(["-d", "Test Pod E", "testPodE"]).exec()
+        GitPod::Select.new([ "testPodB", "testPodC" ]).exec()
+        @out, @err = capture_io do
+          GitPod::List.new([]).exec()
         end
       end
     end
@@ -55,9 +71,14 @@ describe GitPod::List do
   describe "when listing all selected pods" do
     before do
       Dir.chdir(@tempdir) do
-        command = GitPod::List.new ['-u']
+        GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
+        GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
+        GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
+        GitPod::Create.new(["-d", "Test Pod D", "testPodD"]).exec()
+        GitPod::Create.new(["-d", "Test Pod E", "testPodE"]).exec()
+        GitPod::Select.new([ "testPodB", "testPodC" ]).exec()
         @out, @err = capture_io do
-          command.exec()
+          GitPod::List.new(['-u']).exec()
         end
       end
     end
@@ -74,9 +95,14 @@ describe GitPod::List do
   describe "when listing all not selected pods" do
     before do
       Dir.chdir(@tempdir) do
-        command = GitPod::List.new ['--no-used']
+        GitPod::Create.new(["-d", "Test Pod A", "testPodA"]).exec()
+        GitPod::Create.new(["-d", "Test Pod B", "testPodB"]).exec()
+        GitPod::Create.new(["-d", "Test Pod C", "testPodC"]).exec()
+        GitPod::Create.new(["-d", "Test Pod D", "testPodD"]).exec()
+        GitPod::Create.new(["-d", "Test Pod E", "testPodE"]).exec()
+        GitPod::Select.new([ "testPodB", "testPodC" ]).exec()
         @out, @err = capture_io do
-          command.exec()
+          GitPod::List.new(['--no-used']).exec()
         end
       end
     end
