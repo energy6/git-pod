@@ -13,7 +13,8 @@ class OptionParser
   # Returns the Hash with all previously defined arguments
   # Keys are argument names, values are the description 
   def args
-    return @args || {}
+    @args ||= {}
+    return @args
   end
   
 end
