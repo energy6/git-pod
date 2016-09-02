@@ -30,11 +30,11 @@ module GitPod
       super do        
         raise SubCommandException, "One pod name must be given" if @args.size != 1
 
-        mod = Pod.new(@args[0])
+        pod = Pod.new(@args[0])
         branch = @options[:branch] || "master"
 
-        worktree = mod.checkout(branch)
-        puts "Created new worktree for #{mod.name}@#{branch} in #{worktree.dir}"
+        worktree = pod.checkout(branch)
+        puts "Created new worktree for #{pod.name}@#{branch} in #{worktree.dir}"
       end
     end
         

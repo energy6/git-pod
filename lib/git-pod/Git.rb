@@ -71,6 +71,7 @@ module Git
       arr_opts << 'add'
       arr_opts << '-f' if opts[:force]
       arr_opts << '-b' << opts[:branch] if opts[:branch]
+      arr_opts << '--checkout'
       arr_opts += [path]
       arr_opts += [branch] if branch
       command('worktree', arr_opts)

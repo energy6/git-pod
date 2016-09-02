@@ -32,7 +32,7 @@ module GitPod
       
       repo.with_temp do
         repo.checkout(bname, :orphan => true)
-        repo.reset() 
+        repo.reset()
         Metadata.create_file(name, desc: desc)
         repo.add(Metadata.filename(name))
         repo.commit("Initial new pod #{name}")
@@ -46,12 +46,13 @@ module GitPod
     # naming schema. 
     def self.remove(name)
       repo = Git.open(Dir.pwd)
+      workdir = File.join(repo.dir.to_s, ".worktree", name)
+      FileUtils.remove_entry_secure(workdir) if Dir.exists?(workdir)
+      repo.worktree_prune()
       repo.branches.select{ |b| b.name =~ branch_pattern(name: name) }.each do |b|
         puts "Removing #{b.name}"
         b.delete
       end
-      workdir = File.join(@repo.dir.to_s, ".worktree", @name)
-      FileUtils.remove_entry_secure(workdir) if Dir.exists?(workdir)
     end
         
     # Returns the exact branch name for the named pod and its branch.
@@ -143,7 +144,9 @@ module GitPod
     def checkout(branch)
       zombie_check
       workdir = File.join(@repo.dir.to_s, ".worktree", @name, branch)
-      worktree = @repo.new_worktree(workdir, self.class.branch_name(@name, branch: branch))      
+      worktree = @repo.new_worktree(workdir, self.class.branch_name(@name, branch: branch)) 
+      worktree.reset() # workaround
+      return worktree     
     end
 
     # Add the given files to the index of the named branch.
